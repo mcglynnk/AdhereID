@@ -2,6 +2,7 @@
 data/raw
 data/cleaned
 code_/notes
+code_/required_files.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -132,4 +133,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-/code_/required_files.py
+
