@@ -41,11 +41,12 @@ y = ncpa_data.iloc[:, 0]  # Target (adherence)
 le = LabelEncoder()
 y = le.fit_transform(y)  # ********* 0 = adherence, 1 = non-adherence
 
+
 # -------------------------------------------------------------------------------------------------------------------
 # Pre-processing
 # -------------------------------------------------------------------------------------------------------------------
 
-# 1.  Write a function to impute some missing values. ---------------------------------------------------------------
+# 1.  Function to impute some missing values. ---------------------------------------------------------------
 # Some columns have 'no reponse' to the survey (not a lot).
 label_dict = defaultdict(LabelEncoder)
 print__ = True  # code switch for testing
