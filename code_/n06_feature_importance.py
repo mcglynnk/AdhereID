@@ -6,6 +6,7 @@ import numpy as np
 
 # Plotting
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # ML setup
 from sklearn.model_selection import train_test_split
@@ -30,7 +31,51 @@ import eli5
 # -------------------------------------------------------------------------------------------------------------------
 from code_.n05_final_logreg import X_processed, y
 
+# -------------------------------------------------------------------------------------------------------------------
+# Explain model coefficients
+# -------------------------------------------------------------------------------------------------------------------
+from code_.n05_final_logreg import X_processed, y, pipeline
 
+coefs_ = eli5.format_as_dataframe(
+    eli5.explain_weights_sklearn(pipeline.return_model().named_steps['logistic_regression'], top=20,
+                                 feature_names=X_processed.columns.to_list()))
+
+# from eli5 import show_prediction
+# eli5.format_as_image(eli5.show_prediction(pipeline.return_model().named_steps['logistic_regression'],
+#                                              X_processed.iloc[43],
+#                              feature_names=X_processed.columns.to_list(), show_feature_values=True))
+
+print(coefs_)
+##
+# Invert the weights to make the graph more readable (a neg coef means a neg contrib to non-adherence)
+coefs_['weight'] = [-i for i in coefs_['weight']]
+coefs_ = coefs_.drop(coefs_[coefs_['feature']=='<BIAS>'].index)
+# Make a new column for coloring
+coefs_['is_positive'] = coefs_['weight']>0
+print(coefs_)
+
+
+# sns.set_palette(sns.diverging_palette(240, 10, n=4))
+fig, ax = plt.subplots()
+sns.barplot(y='feature', x='weight', data=coefs_.sort_values(by='weight', ascending=False),
+            # palette = coefs_['is_positive'].map({True: 'cornflowerblue', False: 'red'}),
+            palette=sns.diverging_palette(10, 240, n=12),
+            label='coef')
+plt.xlabel('Contribution towards adherence')
+plt.ylabel('Feature')
+plt.show()
+
+##
+from eli5.sklearn import PermutationImportance
+
+X_train, X_test, y_train, y_test = pipeline.split_()
+lr_model = pipeline.return_model()
+perm = PermutationImportance(lr_model, scoring='recall', random_state=12, n_iter=2).fit(X_test, y_test)
+
+permut_df = eli5.format_as_dataframe(eli5.explain_weights(perm, feature_names=X_processed.columns.to_list()))
+print(eli5.format_as_text(eli5.explain_weights_sklearn(perm, feature_names=X_processed.columns.to_list())))
+
+##
 # -------------------------------------------------------------------------------------------------------------------
 # Permutation importance
 # -------------------------------------------------------------------------------------------------------------------
@@ -165,7 +210,6 @@ def check_RFE(X):
 
 
 check_RFE(X_processed.iloc[:,0:10])
-
 
 
 # -------------------------------------------------------------------------------------------------------------------

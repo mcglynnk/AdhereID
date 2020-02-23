@@ -7,6 +7,7 @@ pd.options.display.width = 120
 import pickle
 from collections import defaultdict
 from termcolor import colored
+import statistics
 
 # ML setup
 from sklearn.model_selection import train_test_split
@@ -18,8 +19,8 @@ from imblearn.over_sampling import SMOTE
 
 # Model scoring
 from sklearn.metrics import classification_report
-from sklearn.metrics import recall_score
-from sklearn.model_selection import StratifiedKFold  # Validation
+from sklearn.metrics import recall_score, fbeta_score, make_scorer
+from sklearn.model_selection import StratifiedKFold, cross_validate, cross_val_score  # Validation
 
 # ML models
 from sklearn.linear_model import LogisticRegression
@@ -254,12 +255,10 @@ def process_data(X):
     numeric_cols = ['age', 'n_prescriptions', 'n_provider_visits']
     ordinal_cols = ['first_got_rx', 'income', 'general_health', 'med_burden', 'can_afford_rx', 'understand_health_prob',
                     'educ', ]
-    categorical_cols = ['sex',
+    categorical_cols = ['sex', # Commented out variables were dropped, no impact on model predictions
                         # 'have_health_insur','have_medicare', 'metro',
                         'parent',
-                        # 'US_region',
-                        # 'ownhome',
-                        # 'mstatus',
+                        # 'US_region', 'ownhome', 'mstatus',
                         'emply',
                         'has_diabetes', 'has_hyperten', 'has_asthma_etc',
                         'has_heart_condition', 'has_hi_cholesterol']
@@ -294,13 +293,14 @@ import eli5
 
 class Model:
     """
-    Purpose: On X and y, train_test_split, fit to pipeline, and make predictions.  Putting all of these in a class
-    instead of separate functions makes it easier to use in the plots in file n07_model_performance_plots.py.
+    Purpose: On X and y, train_test_split, fit to pipeline, make predictions, and cross validate.  Putting all of these
+    in a class instead of separate functions makes it easier to use in the plots in file n07_model_performance_plots.py.
 
     Initialize the class first with x = Model(X, y, model name), then can do:
         x.split_() : get training and test set variables out
         x.return_model() : get the model itself out (for saving to file)
         x.predict_on_test() : get predictions out for scoring and plots
+        x.cross_val(): print cross-validations scores (recall and f-beta score)
     """
     def __init__(self, X, y, model):
         self.X = X
@@ -318,23 +318,58 @@ class Model:
         return train_test_split(self.X, self.y, test_size=0.20, random_state=42, stratify=y)
 
     def return_model(self):
+        """
+        Train model and return the model (for saving to file)
+        """
         X_train, X_test, y_train, y_test = Model.split_(self)
         trained_model = self.pipeline_.fit(X_train, y_train)
         return trained_model
 
     def predict_on_test(self):
+        """
+        Get model from the function above, predict on X_test
+        Returns: predictions table
+        """
         X_train, X_test, y_train, y_test = Model.split_(self)
         # predictions = self.pipeline_.predict(X_test)
+        tr_predictions = Model.return_model(self).predict(X_train)
         predictions = Model.return_model(self).predict(X_test)
 
+        # Scoring
         print(eli5.format_as_text(
-            eli5.explain_weights(Model.return_model(self).named_steps['logistic_regression'], top=15,
+            eli5.explain_weights_sklearn(Model.return_model(self).named_steps['logistic_regression'],
                                  feature_names=X_processed.columns.to_list())))
         print(classification_report(y_true=y_test, y_pred=predictions))
+        print("train  ",classification_report(y_true=y_train, y_pred=tr_predictions))
+        print('F-beta score: ', fbeta_score(y_true=y_test, y_pred=predictions, beta=5), '\n')
         print(pd.crosstab(y_test, predictions, rownames=['Actual adherence'], colnames=['Predicted adherence']))
         print('\n')
         print('Overall recall score: ', recall_score(y_true=y_test, y_pred=predictions))
         return predictions
+
+    def cross_val(self):
+        """
+        Print cross-validation scores - means of recall score and f-beta across all k-folds
+        """
+        cv = StratifiedKFold(n_splits=10, random_state=42, shuffle=True)
+        scoring = {'recall': 'recall',
+                   'f-beta': make_scorer(fbeta_score, beta=4)}
+        scores = cross_validate(Model.return_model(self),
+                       X_processed, y,
+                       scoring=scoring,
+                       cv=cv,
+                       return_train_score=True,
+                       )
+        print('\n')
+        print('scoring', ' ' * 12, 'score value', '\n', '-'*34)
+        for score, key in zip(scores, scores.keys()):
+            print(key,
+                  ' '*(18-len(key)),
+                  round(statistics.mean(scores[score]), 3),
+                  ' '*(4-len(str(scores[score].mean().round(3)))),
+                  '+/-',
+                  round(statistics.stdev(scores[score]), 2))
+
 
 
 # Initialize instance of Model class using tuned logistic regression model
@@ -353,6 +388,9 @@ lr_model = pipeline.return_model()
 
 # Get predictions on test set
 predictions = pipeline.predict_on_test()
+
+# Print cross-validation scores
+pipeline.cross_val()
 
 # Save model to file
 modelfile = r'code_/lr_model.sav'
@@ -379,7 +417,6 @@ Actual adherence
 # -------------------------------------------------------------------------------------------------------------------
 # Hyperparameter Tuning
 # -------------------------------------------------------------------------------------------------------------------
-
 
 # Hyperparameter tuning the logistic regression model with GridSearchCV
 def hyperparam_tune(X, y, model):
@@ -412,7 +449,7 @@ def hyperparam_tune(X, y, model):
 # hyperparam_tune(X_processed, y, lr_model)
 
 
-# -------------------------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------
 # Compare model performance on subsets of the data
 # -------------------------------------------------------------------------------------------------------------------
 
