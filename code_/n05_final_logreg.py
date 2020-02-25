@@ -419,34 +419,34 @@ Actual adherence
 # -------------------------------------------------------------------------------------------------------------------
 
 # Hyperparameter tuning the logistic regression model with GridSearchCV
-def hyperparam_tune(X, y, model):
-    # Scale
-    s = StandardScaler()
-    X = s.fit_transform(X)
+def hyperparam_tune(model):
 
     # Split test and train
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = pipeline.split_()
 
     kfold = StratifiedKFold(n_splits=10, random_state=42, shuffle=True)
 
-    # Logistic Regression
     param_grid_LR = {
-        'logistic_regression__penalty': ['l2', 'l1'],
-        'logistic_regression__C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
-        'logistic_regression__max_iter': [3000],
-        'logistic_regression__class_weight': [{1: 0.5, 0: 0.5}, {1: 0.9, 0: 0.1}, {1: 0.8, 0: 0.2},
-                                              {1: 0.95, 0: 0.05}, 'balanced'],
-        'logistic_regression__solver': ['lbfgs', 'liblinear', 'sag', 'saga']
+        'penalty': ['l2', 'l1'],
+        'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+        'max_iter': [3000],
+        'class_weight': [{1: 0.5, 0: 0.5}, {1: 0.9, 0: 0.1}, {1: 0.8, 0: 0.2},
+                         {1: 0.95, 0: 0.05}, 'balanced'],
+        'solver': ['lbfgs', 'liblinear', 'sag', 'saga']
     }
 
-    gs = GridSearchCV(model, param_grid=param_grid_LR, cv=kfold, n_jobs=-1, scoring='recall', verbose=True)
+    gs = GridSearchCV(estimator=model, param_grid=param_grid_LR, cv=kfold, n_jobs=-1,
+                      # scoring=make_scorer(fbeta_score, beta=2),
+                      scoring='f1_micro',
+                      verbose=False)
     gs.fit(X_train, y_train)
     print('Best score: ', gs.best_score_)
     print('Best params: ', gs.best_params_)
     print('Best estimator: ', gs.best_estimator_)
 
 
-# hyperparam_tune(X_processed, y, lr_model)
+lrmodel = LogisticRegression()
+hyperparam_tune(lrmodel)
 
 
 # -------------------------------------------------------------------------------------------------------------------
