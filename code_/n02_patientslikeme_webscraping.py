@@ -15,7 +15,8 @@ PatientsLikeMe: Find answers, support and a path forward with people like you.
 https://www.patientslikeme.com/
 accessed 1-20-2020
 
-I used both beautifulsoup and mechanicalsoup in this web scraper. Mechanicalsoup builds on beautifulsoup, but adds
+I used both beautifulsoup and mechanicalsoup in this web scraper. Mechanicalsoup builds on beautifulsoup, but has 
+added functionality for logins and page navigation.
 
 '''
 import mechanicalsoup

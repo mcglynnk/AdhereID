@@ -34,6 +34,8 @@ from sklearn.model_selection import GridSearchCV
 from code_.required_files import ncpa_stopped_or_didnt_fill_file
 
 ncpa_data = pd.read_csv(ncpa_stopped_or_didnt_fill_file)
+ncpa_data = ncpa_data[ncpa_data['n_prescriptions']<73]
+ncpa_data = ncpa_data.reset_index(drop=True)
 
 # Separate target and features
 X = ncpa_data.iloc[:, 1:]  # Features
@@ -446,7 +448,7 @@ def hyperparam_tune(model):
 
 
 lrmodel = LogisticRegression()
-hyperparam_tune(lrmodel)
+# hyperparam_tune(lrmodel)
 
 
 # -------------------------------------------------------------------------------------------------------------------
