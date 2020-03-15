@@ -2,7 +2,9 @@
 #### Predicting medication adherence
 
 Welcome to AdhereID!  This is a project I completed as part of the Insight Health Data Science Program.  
-The project structure, background and data sources are described below.
+The project structure, background and data sources are described below.  This repository holds the code for the data collection and machine learning modeling.      
+    
+At the end of the project, I deployed AdhereID as a live app using Flask and AWS EC2.  Check out [this repository](https://github.com/mcglynnk/AdhereID_app) for the Flask app code, and [view the live AdhereID app here](http://adhere-id.com/)!
 
 #### Project Structure    
 ```
