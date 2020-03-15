@@ -2,7 +2,7 @@
 #### Predicting medication adherence
 
 Welcome to AdhereID!  This is a project I completed as part of the Insight Health Data Science Program.  
-Since I coded the whole project .py files via PyCharm, the purpose of this notebook is to provide an overview of the project, code and associated files.
+The project structure, background and data sources are described below.
 
 #### Project Structure    
 ```
