@@ -1,11 +1,13 @@
-## AdhereID
+  ## AdhereID  
 #### Predicting medication adherence
 
 Welcome to AdhereID!  This is a project I completed as part of the Insight Health Data Science Program.  
 The project structure, background and data sources are described below.  This repository holds the code for the data collection and machine learning modeling.      
     
 At the end of the project, I deployed AdhereID as a live app using Flask and AWS EC2.  Check out [this repository](https://github.com/mcglynnk/AdhereID_app) for the Flask app code, and [view the live AdhereID app here](http://adhere-id.com/)!
-
+    
+![AdhereID_screenshot](Capture.PNG)      
+    
 #### Project Structure    
 ```
 code_/   
@@ -55,7 +57,7 @@ Phone survey dataset of 1,020 adults in the U.S. See documents/ for the dataset'
 
 #### 2.  PatientsLikeMe
 An online community for discussing medical conditions and medications.  
-- Web scraped using beautifulsoup (Accessed 1-20-2020)
+- Web scraped using beautifulsoup (Accessed 1-20-2020, user identifiers not included)
 - Data format: data extracted from HTML
 - 10,025 rows of drug reviews (adherence, burden(difficulty of taking) and cost) x 11 columns
 
