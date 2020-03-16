@@ -1,5 +1,5 @@
-  ## AdhereID  
-#### Predicting medication adherence
+  # AdhereID  
+### Predicting medication adherence
 
 Welcome to AdhereID!  This is a project I completed as part of the Insight Health Data Science Program.  
 The project structure, background and data sources are described below.  This repository holds the code for the data collection and machine learning modeling.      
@@ -8,7 +8,7 @@ At the end of the project, I deployed AdhereID as a live app using Flask and AWS
     
 ![AdhereID_screenshot](Capture.PNG)      
     
-#### Project Structure    
+### Project Structure    
 ```
 code_/   
     functions/ # Custom functions used in n05_final_logreg.py
@@ -39,7 +39,7 @@ requirements.txt
 ```  
 
 
-#### Data Sources
+### Data Sources
 
 The goal of this project was to develop a machine learning model to predict medication adherence.  Medication non-adherence is a widespread problem in the healthcare industry. About 131 million Americans (half the population!) take at least one prescription medication, and 10~25% of these people don't take their prescription as prescribed.  
    
